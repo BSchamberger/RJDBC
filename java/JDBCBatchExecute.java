@@ -48,10 +48,22 @@ public class JDBCBatchExecute {
 		while (i < ptr) {
 		    if (types[i] == T_DOUBLE) {
 			double val = ((double[])(cache[i]))[l]; // FIXME: NA?
-			s.setDouble(i + 1, val);
+			if (Double.isNaN(val)) {
+			  s.setNull(i + 1, java.sql.Types.DOUBLE);
+			} else if (!Double.isFinite(val)) {
+			  if (val == Double.POSITIVE_INFINITY)
+			      s.setDouble(i + 1, Double.MAX_VALUE);
+			  else
+			      s.setDouble(i + 1, -Double.MAX_VALUE);
+			} else  {
+			  s.setDouble(i + 1, val);
+			}
 		    } else if (types[i] == T_INT) {
 			int val = ((int[])(cache[i]))[l]; // FIXME: NA?
-			s.setInt(i + 1, val);
+			if (val == Integer.MIN_VALUE)
+			    s.setNull(i + 1, java.sql.Types.INTEGER);
+			else
+			    s.setInt(i + 1, val);
 		    } else if(types[i] == T_STRING) {
 			String val = ((String[])(cache[i]))[l];
 			if (val == null)

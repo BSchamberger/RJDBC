@@ -101,7 +101,13 @@ public class JDBCResultPull {
 	    for (int i = 0; i < cols; i++)
 		if (cTypes[i] == CT_NUMERIC) {
 		    double val = rs.getDouble(i + 1);
-		    if (rs.wasNull()) val = NA_double;
+		    if (rs.wasNull()) {
+		      val = NA_double;
+		    } else if (val == Double.MAX_VALUE) {
+		      val = Double.POSITIVE_INFINITY;
+		    } else if (val == -Double.MAX_VALUE) {
+		      val = Double.NEGATIVE_INFINITY;
+		    }
 		    ((double[])data[i])[count] = val; 
 		} else
 		    ((String[])data[i])[count] = rs.getString(i + 1); 
